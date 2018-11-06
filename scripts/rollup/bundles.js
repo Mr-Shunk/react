@@ -3,6 +3,7 @@
 const bundleTypes = {
   UMD_DEV: 'UMD_DEV',
   UMD_PROD: 'UMD_PROD',
+  UMD_PROFILING: 'UMD_PROFILING',
   NODE_DEV: 'NODE_DEV',
   NODE_PROD: 'NODE_PROD',
   NODE_PROFILING: 'NODE_PROFILING',
@@ -19,6 +20,7 @@ const bundleTypes = {
 
 const UMD_DEV = bundleTypes.UMD_DEV;
 const UMD_PROD = bundleTypes.UMD_PROD;
+const UMD_PROFILING = bundleTypes.UMD_PROFILING;
 const NODE_DEV = bundleTypes.NODE_DEV;
 const NODE_PROD = bundleTypes.NODE_PROD;
 const NODE_PROFILING = bundleTypes.NODE_PROFILING;
@@ -58,9 +60,9 @@ const bundles = [
     bundleTypes: [
       UMD_DEV,
       UMD_PROD,
+      UMD_PROFILING,
       NODE_DEV,
       NODE_PROD,
-      NODE_PROFILING,
       FB_WWW_DEV,
       FB_WWW_PROD,
       FB_WWW_PROFILING,
@@ -77,6 +79,7 @@ const bundles = [
     bundleTypes: [
       UMD_DEV,
       UMD_PROD,
+      UMD_PROFILING,
       NODE_DEV,
       NODE_PROD,
       NODE_PROFILING,
@@ -360,14 +363,31 @@ const bundles = [
     externals: [],
   },
 
-  /******* Simple Cache Provider (experimental) *******/
+  /******* React Debug Tools *******/
   {
-    label: 'simple-cache-provider',
-    bundleTypes: [FB_WWW_DEV, FB_WWW_PROD, NODE_DEV, NODE_PROD],
+    label: 'react-debug-tools',
+    bundleTypes: [NODE_DEV, NODE_PROD],
     moduleType: ISOMORPHIC,
-    entry: 'simple-cache-provider',
-    global: 'SimpleCacheProvider',
-    externals: ['react'],
+    entry: 'react-debug-tools',
+    global: 'ReactDebugTools',
+    externals: [],
+  },
+
+  /******* React Cache (experimental) *******/
+  {
+    label: 'react-cache',
+    bundleTypes: [
+      FB_WWW_DEV,
+      FB_WWW_PROD,
+      NODE_DEV,
+      NODE_PROD,
+      UMD_DEV,
+      UMD_PROD,
+    ],
+    moduleType: ISOMORPHIC,
+    entry: 'react-cache',
+    global: 'ReactCache',
+    externals: ['react', 'scheduler'],
   },
 
   /******* createComponentWithSubscriptions (experimental) *******/
@@ -382,16 +402,41 @@ const bundles = [
 
   /******* React Scheduler (experimental) *******/
   {
-    label: 'schedule',
+    label: 'scheduler',
     bundleTypes: [NODE_DEV, NODE_PROD, FB_WWW_DEV, FB_WWW_PROD],
     moduleType: ISOMORPHIC,
-    entry: 'schedule',
-    global: 'Schedule',
+    entry: 'scheduler',
+    global: 'Scheduler',
+    externals: [],
+  },
+
+  /******* Jest React (experimental) *******/
+  {
+    label: 'jest-react',
+    bundleTypes: [NODE_DEV, NODE_PROD, FB_WWW_DEV, FB_WWW_PROD],
+    moduleType: ISOMORPHIC,
+    entry: 'jest-react',
+    global: 'JestReact',
+    externals: ['jest-diff'],
+  },
+
+  /******* ESLint Plugin for Hooks (proposal) *******/
+  {
+    label: 'eslint-plugin-react-hooks',
+    // TODO: it's awkward to create a bundle for this
+    // but if we don't, the package won't get copied.
+    // We also can't create just DEV bundle because
+    // it contains a NODE_ENV check inside.
+    // We should probably tweak our build process
+    // to allow "raw" packages that don't get bundled.
+    bundleTypes: [NODE_DEV, NODE_PROD],
+    moduleType: ISOMORPHIC,
+    entry: 'eslint-plugin-react-hooks',
     externals: [],
   },
 
   {
-    label: 'schedule-tracking',
+    label: 'scheduler-tracing',
     bundleTypes: [
       FB_WWW_DEV,
       FB_WWW_PROD,
@@ -401,8 +446,8 @@ const bundles = [
       NODE_PROFILING,
     ],
     moduleType: ISOMORPHIC,
-    entry: 'schedule/tracking',
-    global: 'ScheduleTracking',
+    entry: 'scheduler/tracing',
+    global: 'SchedulerTracing',
     externals: [],
   },
 ];

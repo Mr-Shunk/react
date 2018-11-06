@@ -238,6 +238,7 @@ export const scheduleDeferredCallback =
   ReactNativeFrameScheduling.scheduleDeferredCallback;
 export const cancelDeferredCallback =
   ReactNativeFrameScheduling.cancelDeferredCallback;
+export const shouldYield = ReactNativeFrameScheduling.shouldYield;
 
 export const scheduleTimeout = setTimeout;
 export const cancelTimeout = clearTimeout;
@@ -450,4 +451,42 @@ export function removeChildFromContainer(
 
 export function resetTextContent(instance: Instance): void {
   // Noop
+}
+
+export function hideInstance(instance: Instance): void {
+  const viewConfig = instance.viewConfig;
+  const updatePayload = ReactNativeAttributePayload.create(
+    {style: {display: 'none'}},
+    viewConfig.validAttributes,
+  );
+  UIManager.updateView(
+    instance._nativeTag,
+    viewConfig.uiViewClassName,
+    updatePayload,
+  );
+}
+
+export function hideTextInstance(textInstance: TextInstance): void {
+  throw new Error('Not yet implemented.');
+}
+
+export function unhideInstance(instance: Instance, props: Props): void {
+  const viewConfig = instance.viewConfig;
+  const updatePayload = ReactNativeAttributePayload.diff(
+    {...props, style: [props.style, {display: 'none'}]},
+    props,
+    viewConfig.validAttributes,
+  );
+  UIManager.updateView(
+    instance._nativeTag,
+    viewConfig.uiViewClassName,
+    updatePayload,
+  );
+}
+
+export function unhideTextInstance(
+  textInstance: TextInstance,
+  text: string,
+): void {
+  throw new Error('Not yet implemented.');
 }

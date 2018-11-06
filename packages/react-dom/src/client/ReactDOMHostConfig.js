@@ -36,6 +36,8 @@ import {
   DOCUMENT_FRAGMENT_NODE,
 } from '../shared/HTMLNodeType';
 
+import type {DOMContainer} from './ReactDOM';
+
 export type Type = string;
 export type Props = {
   autoFocus?: boolean,
@@ -43,6 +45,9 @@ export type Props = {
   hidden?: boolean,
   suppressHydrationWarning?: boolean,
   dangerouslySetInnerHTML?: mixed,
+  style?: {
+    display?: string,
+  },
 };
 export type Container = Element | Document;
 export type Instance = Element;
@@ -62,14 +67,17 @@ export type NoTimeout = -1;
 
 export {
   unstable_now as now,
-  unstable_scheduleWork as scheduleDeferredCallback,
-  unstable_cancelScheduledWork as cancelDeferredCallback,
-} from 'schedule';
+  unstable_scheduleCallback as scheduleDeferredCallback,
+  unstable_shouldYield as shouldYield,
+  unstable_cancelCallback as cancelDeferredCallback,
+} from 'scheduler';
 
 let SUPPRESS_HYDRATION_WARNING;
 if (__DEV__) {
   SUPPRESS_HYDRATION_WARNING = 'suppressHydrationWarning';
 }
+
+const STYLE = 'style';
 
 let eventsEnabled: ?boolean = null;
 let selectionInformation: ?mixed = null;
@@ -276,8 +284,13 @@ export function createTextInstance(
 }
 
 export const isPrimaryRenderer = true;
-export const scheduleTimeout = setTimeout;
-export const cancelTimeout = clearTimeout;
+// This initialization code may run even on server environments
+// if a component just imports ReactDOM (e.g. for findDOMNode).
+// Some environments might not have setTimeout or clearTimeout.
+export const scheduleTimeout =
+  typeof setTimeout === 'function' ? setTimeout : (undefined: any);
+export const cancelTimeout =
+  typeof clearTimeout === 'function' ? clearTimeout : (undefined: any);
 export const noTimeout = -1;
 
 // -------------------
@@ -342,7 +355,7 @@ export function appendChild(
 }
 
 export function appendChildToContainer(
-  container: Container,
+  container: DOMContainer,
   child: Instance | TextInstance,
 ): void {
   let parentNode;
@@ -358,9 +371,14 @@ export function appendChildToContainer(
   // through the React tree. However, on Mobile Safari the click would
   // never bubble through the *DOM* tree unless an ancestor with onclick
   // event exists. So we wouldn't see it and dispatch it.
-  // This is why we ensure that containers have inline onclick defined.
+  // This is why we ensure that non React root containers have inline onclick
+  // defined.
   // https://github.com/facebook/react/issues/11918
-  if (parentNode.onclick === null) {
+  const reactRootContainer = container._reactRootContainer;
+  if (
+    (reactRootContainer === null || reactRootContainer === undefined) &&
+    parentNode.onclick === null
+  ) {
     // TODO: This cast may not be sound for SVG, MathML or custom elements.
     trapClickOnNonInteractiveElement(((parentNode: any): HTMLElement));
   }
@@ -402,6 +420,37 @@ export function removeChildFromContainer(
   } else {
     container.removeChild(child);
   }
+}
+
+export function hideInstance(instance: Instance): void {
+  // TODO: Does this work for all element types? What about MathML? Should we
+  // pass host context to this method?
+  instance = ((instance: any): HTMLElement);
+  instance.style.display = 'none';
+}
+
+export function hideTextInstance(textInstance: TextInstance): void {
+  textInstance.nodeValue = '';
+}
+
+export function unhideInstance(instance: Instance, props: Props): void {
+  instance = ((instance: any): HTMLElement);
+  const styleProp = props[STYLE];
+  const display =
+    styleProp !== undefined &&
+    styleProp !== null &&
+    styleProp.hasOwnProperty('display')
+      ? styleProp.display
+      : null;
+  // $FlowFixMe Setting a style property to null is the valid way to reset it.
+  instance.style.display = display;
+}
+
+export function unhideTextInstance(
+  textInstance: TextInstance,
+  text: string,
+): void {
+  textInstance.nodeValue = text;
 }
 
 // -------------------

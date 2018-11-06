@@ -7,10 +7,14 @@
 
 import assign from 'object-assign';
 import {
-  unstable_cancelScheduledWork,
+  unstable_cancelCallback,
+  unstable_shouldYield,
   unstable_now,
-  unstable_scheduleWork,
-} from 'schedule';
+  unstable_scheduleCallback,
+  unstable_runWithPriority,
+  unstable_wrapCallback,
+  unstable_getCurrentPriorityLevel,
+} from 'scheduler';
 import {
   __interactionsRef,
   __subscriberRef,
@@ -18,10 +22,10 @@ import {
   unstable_getCurrent,
   unstable_getThreadID,
   unstable_subscribe,
-  unstable_track,
+  unstable_trace,
   unstable_unsubscribe,
   unstable_wrap,
-} from 'schedule/tracking';
+} from 'scheduler/tracing';
 import ReactCurrentOwner from './ReactCurrentOwner';
 import ReactDebugCurrentFrame from './ReactDebugCurrentFrame';
 
@@ -38,19 +42,23 @@ if (__UMD__) {
   // This re-export is only required for UMD bundles;
   // CJS bundles use the shared NPM package.
   Object.assign(ReactSharedInternals, {
-    Schedule: {
-      unstable_cancelScheduledWork,
+    Scheduler: {
+      unstable_cancelCallback,
+      unstable_shouldYield,
       unstable_now,
-      unstable_scheduleWork,
+      unstable_scheduleCallback,
+      unstable_runWithPriority,
+      unstable_wrapCallback,
+      unstable_getCurrentPriorityLevel,
     },
-    ScheduleTracking: {
+    SchedulerTracing: {
       __interactionsRef,
       __subscriberRef,
       unstable_clear,
       unstable_getCurrent,
       unstable_getThreadID,
       unstable_subscribe,
-      unstable_track,
+      unstable_trace,
       unstable_unsubscribe,
       unstable_wrap,
     },

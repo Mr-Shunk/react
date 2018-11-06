@@ -7,16 +7,9 @@
  * @flow strict
  */
 
-import invariant from 'shared/invariant';
-
-// Exports ReactDOM.createRoot
 export const enableUserTimingAPI = __DEV__;
 
-// Experimental error-boundary API that can recover from errors within a single
-// render phase
-export const enableGetDerivedStateFromCatch = false;
-// Suspense
-export const enableSuspense = false;
+export const enableHooks = false;
 // Helps identify side effects in begin-phase lifecycle hooks and setState reducers:
 export const debugRenderPhaseSideEffects = false;
 
@@ -33,19 +26,24 @@ export const replayFailedUnitOfWorkWithInvokeGuardedCallback = __DEV__;
 // Warn about deprecated, async-unsafe lifecycles; relates to RFC #6:
 export const warnAboutDeprecatedLifecycles = false;
 
-// Warn about legacy context API
-export const warnAboutLegacyContextAPI = false;
-
 // Gather advanced timing metrics for Profiler subtrees.
 export const enableProfilerTimer = __PROFILE__;
 
-// Track which interactions trigger each commit.
-export const enableSchedulerTracking = __PROFILE__;
+// Trace which interactions trigger each commit.
+export const enableSchedulerTracing = __PROFILE__;
 
 // Only used in www builds.
 export const enableSuspenseServerRenderer = false;
 
 // Only used in www builds.
 export function addUserTimingListener() {
-  invariant(false, 'Not implemented.');
+  throw new Error('Not implemented.');
 }
+
+// React Fire: prevent the value and checked attributes from syncing
+// with their related DOM properties
+export const disableInputAttributeSyncing = false;
+
+// These APIs will no longer be "unstable" in the upcoming 16.7 release,
+// Control this behavior with a flag to support 16.6 minor releases in the meanwhile.
+export const enableStableConcurrentModeAPIs = false;

@@ -25,6 +25,7 @@ import describeComponentFrame from 'shared/describeComponentFrame';
 import ReactSharedInternals from 'shared/ReactSharedInternals';
 import {
   warnAboutDeprecatedLifecycles,
+  enableHooks,
   enableSuspenseServerRenderer,
 } from 'shared/ReactFeatureFlags';
 
@@ -32,12 +33,14 @@ import {
   REACT_FORWARD_REF_TYPE,
   REACT_FRAGMENT_TYPE,
   REACT_STRICT_MODE_TYPE,
-  REACT_ASYNC_MODE_TYPE,
-  REACT_PLACEHOLDER_TYPE,
+  REACT_CONCURRENT_MODE_TYPE,
+  REACT_SUSPENSE_TYPE,
   REACT_PORTAL_TYPE,
   REACT_PROFILER_TYPE,
   REACT_PROVIDER_TYPE,
   REACT_CONTEXT_TYPE,
+  REACT_LAZY_TYPE,
+  REACT_MEMO_TYPE,
 } from 'shared/ReactSymbols';
 
 import {
@@ -46,6 +49,12 @@ import {
   createMarkupForRoot,
 } from './DOMMarkupOperations';
 import escapeTextForBrowser from './escapeTextForBrowser';
+import {
+  prepareToUseHooks,
+  finishHooks,
+  Dispatcher,
+  DispatcherWithoutHooks,
+} from './ReactPartialRendererHooks';
 import {
   Namespaces,
   getIntrinsicNamespace,
@@ -74,6 +83,7 @@ const toArray = ((React.Children.toArray: any): toArrayType);
 // Each stack is an array of frames which may contain nested stacks of elements.
 let currentDebugStacks = [];
 
+let ReactCurrentOwner = ReactSharedInternals.ReactCurrentOwner;
 let ReactDebugCurrentFrame;
 let prevGetCurrentStackImpl = null;
 let getCurrentServerStackImpl = () => '';
@@ -169,6 +179,7 @@ const didWarnAboutBadClass = {};
 const didWarnAboutDeprecatedWillMount = {};
 const didWarnAboutUndefinedDerivedState = {};
 const didWarnAboutUninitializedState = {};
+const didWarnAboutInvalidateContextType = {};
 const valuePropNames = ['value', 'defaultValue'];
 const newlineEatingTags = {
   listing: true,
@@ -346,13 +357,33 @@ function checkContextTypes(typeSpecs, values, location: string) {
 }
 
 function processContext(type, context) {
-  const maskedContext = maskContext(type, context);
-  if (__DEV__) {
-    if (type.contextTypes) {
-      checkContextTypes(type.contextTypes, maskedContext, 'context');
+  const contextType = type.contextType;
+  if (typeof contextType === 'object' && contextType !== null) {
+    if (__DEV__) {
+      if (contextType.$$typeof !== REACT_CONTEXT_TYPE) {
+        let name = getComponentName(type) || 'Component';
+        if (!didWarnAboutInvalidateContextType[name]) {
+          didWarnAboutInvalidateContextType[type] = true;
+          warningWithoutStack(
+            false,
+            '%s defines an invalid contextType. ' +
+              'contextType should point to the Context object returned by React.createContext(). ' +
+              'Did you accidentally pass the Context.Provider instead?',
+            name,
+          );
+        }
+      }
     }
+    return contextType._currentValue;
+  } else {
+    const maskedContext = maskContext(type, context);
+    if (__DEV__) {
+      if (type.contextTypes) {
+        checkContextTypes(type.contextTypes, maskedContext, 'context');
+      }
+    }
+    return maskedContext;
   }
-  return maskedContext;
 }
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -540,7 +571,11 @@ function resolve(
           }
         }
       }
+      const componentIdentity = {};
+      prepareToUseHooks(componentIdentity);
       inst = Component(element.props, publicContext, updater);
+      inst = finishHooks(Component, element.props, inst, publicContext);
+
       if (inst == null || inst.render == null) {
         child = inst;
         validateRenderResult(child, Component);
@@ -786,49 +821,59 @@ class ReactDOMServerRenderer {
       return null;
     }
 
-    let out = '';
-    while (out.length < bytes) {
-      if (this.stack.length === 0) {
-        this.exhausted = true;
-        break;
-      }
-      const frame: Frame = this.stack[this.stack.length - 1];
-      if (frame.childIndex >= frame.children.length) {
-        const footer = frame.footer;
-        out += footer;
-        if (footer !== '') {
-          this.previousWasTextNode = false;
-        }
-        this.stack.pop();
-        if (frame.type === 'select') {
-          this.currentSelectValue = null;
-        } else if (
-          frame.type != null &&
-          frame.type.type != null &&
-          frame.type.type.$$typeof === REACT_PROVIDER_TYPE
-        ) {
-          const provider: ReactProvider<any> = (frame.type: any);
-          this.popProvider(provider);
-        }
-        continue;
-      }
-      const child = frame.children[frame.childIndex++];
-      if (__DEV__) {
-        pushCurrentDebugStack(this.stack);
-        // We're starting work on this frame, so reset its inner stack.
-        ((frame: any): FrameDev).debugElementStack.length = 0;
-        try {
-          // Be careful! Make sure this matches the PROD path below.
-          out += this.render(child, frame.context, frame.domNamespace);
-        } finally {
-          popCurrentDebugStack();
-        }
-      } else {
-        // Be careful! Make sure this matches the DEV path above.
-        out += this.render(child, frame.context, frame.domNamespace);
-      }
+    const prevDispatcher = ReactCurrentOwner.currentDispatcher;
+    if (enableHooks) {
+      ReactCurrentOwner.currentDispatcher = Dispatcher;
+    } else {
+      ReactCurrentOwner.currentDispatcher = DispatcherWithoutHooks;
     }
-    return out;
+    try {
+      let out = '';
+      while (out.length < bytes) {
+        if (this.stack.length === 0) {
+          this.exhausted = true;
+          break;
+        }
+        const frame: Frame = this.stack[this.stack.length - 1];
+        if (frame.childIndex >= frame.children.length) {
+          const footer = frame.footer;
+          out += footer;
+          if (footer !== '') {
+            this.previousWasTextNode = false;
+          }
+          this.stack.pop();
+          if (frame.type === 'select') {
+            this.currentSelectValue = null;
+          } else if (
+            frame.type != null &&
+            frame.type.type != null &&
+            frame.type.type.$$typeof === REACT_PROVIDER_TYPE
+          ) {
+            const provider: ReactProvider<any> = (frame.type: any);
+            this.popProvider(provider);
+          }
+          continue;
+        }
+        const child = frame.children[frame.childIndex++];
+        if (__DEV__) {
+          pushCurrentDebugStack(this.stack);
+          // We're starting work on this frame, so reset its inner stack.
+          ((frame: any): FrameDev).debugElementStack.length = 0;
+          try {
+            // Be careful! Make sure this matches the PROD path below.
+            out += this.render(child, frame.context, frame.domNamespace);
+          } finally {
+            popCurrentDebugStack();
+          }
+        } else {
+          // Be careful! Make sure this matches the DEV path above.
+          out += this.render(child, frame.context, frame.domNamespace);
+        }
+      }
+      return out;
+    } finally {
+      ReactCurrentOwner.currentDispatcher = prevDispatcher;
+    }
   }
 
   render(
@@ -896,7 +941,7 @@ class ReactDOMServerRenderer {
 
       switch (elementType) {
         case REACT_STRICT_MODE_TYPE:
-        case REACT_ASYNC_MODE_TYPE:
+        case REACT_CONCURRENT_MODE_TYPE:
         case REACT_PROFILER_TYPE:
         case REACT_FRAGMENT_TYPE: {
           const nextChildren = toArray(
@@ -916,7 +961,7 @@ class ReactDOMServerRenderer {
           this.stack.push(frame);
           return '';
         }
-        case REACT_PLACEHOLDER_TYPE: {
+        case REACT_SUSPENSE_TYPE: {
           if (enableSuspenseServerRenderer) {
             const nextChildren = toArray(
               // Always use the fallback when synchronously rendering to string.
@@ -935,6 +980,8 @@ class ReactDOMServerRenderer {
             }
             this.stack.push(frame);
             return '';
+          } else {
+            invariant(false, 'ReactDOMServer does not yet support Suspense.');
           }
         }
         // eslint-disable-next-line-no-fallthrough
@@ -945,9 +992,39 @@ class ReactDOMServerRenderer {
         switch (elementType.$$typeof) {
           case REACT_FORWARD_REF_TYPE: {
             const element: ReactElement = ((nextChild: any): ReactElement);
-            const nextChildren = toArray(
-              elementType.render(element.props, element.ref),
+            let nextChildren;
+            const componentIdentity = {};
+            prepareToUseHooks(componentIdentity);
+            nextChildren = elementType.render(element.props, element.ref);
+            nextChildren = finishHooks(
+              elementType.render,
+              element.props,
+              nextChildren,
+              element.ref,
             );
+            nextChildren = toArray(nextChildren);
+            const frame: Frame = {
+              type: null,
+              domNamespace: parentNamespace,
+              children: nextChildren,
+              childIndex: 0,
+              context: context,
+              footer: '',
+            };
+            if (__DEV__) {
+              ((frame: any): FrameDev).debugElementStack = [];
+            }
+            this.stack.push(frame);
+            return '';
+          }
+          case REACT_MEMO_TYPE: {
+            const element: ReactElement = ((nextChild: any): ReactElement);
+            let nextChildren = [
+              React.createElement(
+                elementType.type,
+                Object.assign({ref: element.ref}, element.props),
+              ),
+            ];
             const frame: Frame = {
               type: null,
               domNamespace: parentNamespace,
@@ -1003,8 +1080,11 @@ class ReactDOMServerRenderer {
             this.stack.push(frame);
             return '';
           }
-          default:
-            break;
+          case REACT_LAZY_TYPE:
+            invariant(
+              false,
+              'ReactDOMServer does not yet support lazy-loaded components.',
+            );
         }
       }
 

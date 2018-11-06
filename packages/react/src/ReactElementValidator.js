@@ -187,7 +187,7 @@ function validatePropTypes(element) {
   const type = element.type;
   let name, propTypes;
   if (typeof type === 'function') {
-    // Class or functional component
+    // Class or function component
     name = type.displayName || type.name;
     propTypes = type.propTypes;
   } else if (
@@ -197,7 +197,9 @@ function validatePropTypes(element) {
   ) {
     // ForwardRef
     const functionName = type.render.displayName || type.render.name || '';
-    name = functionName !== '' ? `ForwardRef(${functionName})` : 'ForwardRef';
+    name =
+      type.displayName ||
+      (functionName !== '' ? `ForwardRef(${functionName})` : 'ForwardRef');
     propTypes = type.propTypes;
   } else {
     return;

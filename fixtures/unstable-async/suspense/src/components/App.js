@@ -1,20 +1,13 @@
-import React, {Placeholder, PureComponent} from 'react';
-import {unstable_scheduleWork} from 'schedule';
+import React, {lazy, Suspense, PureComponent} from 'react';
+import {unstable_scheduleCallback} from 'scheduler';
 import {
-  unstable_track as track,
+  unstable_trace as trace,
   unstable_wrap as wrap,
-} from 'schedule/tracking';
-import {createResource} from 'simple-cache-provider';
-import {cache} from '../cache';
+} from 'scheduler/tracing';
 import Spinner from './Spinner';
 import ContributorListPage from './ContributorListPage';
 
-const UserPageResource = createResource(() => import('./UserPage'));
-
-function UserPageLoader(props) {
-  const UserPage = UserPageResource.read(cache).default;
-  return <UserPage {...props} />;
-}
+const UserPage = lazy(() => import('./UserPage'));
 
 export default class App extends PureComponent {
   state = {
@@ -32,15 +25,15 @@ export default class App extends PureComponent {
   }
 
   handleUserClick = id => {
-    track(`View ${id}`, performance.now(), () => {
-      track(`View ${id} (high-pri)`, performance.now(), () =>
+    trace(`View ${id}`, performance.now(), () => {
+      trace(`View ${id} (high-pri)`, performance.now(), () =>
         this.setState({
           currentId: id,
         })
       );
-      unstable_scheduleWork(
+      unstable_scheduleCallback(
         wrap(() =>
-          track(`View ${id} (low-pri)`, performance.now(), () =>
+          trace(`View ${id} (low-pri)`, performance.now(), () =>
             this.setState({
               showDetail: true,
             })
@@ -51,7 +44,7 @@ export default class App extends PureComponent {
   };
 
   handleBackClick = () =>
-    track('View list', performance.now(), () =>
+    trace('View list', performance.now(), () =>
       this.setState({
         currentId: null,
         showDetail: false,
@@ -76,21 +69,21 @@ export default class App extends PureComponent {
           }}>
           Return to list
         </button>
-        <Placeholder delayMs={2000} fallback={<Spinner size="large" />}>
-          <UserPageLoader id={id} />
-        </Placeholder>
+        <Suspense maxDuration={2000} fallback={<Spinner size="large" />}>
+          <UserPage id={id} />
+        </Suspense>
       </div>
     );
   }
 
   renderList(loadingId) {
     return (
-      <Placeholder delayMs={1500} fallback={<Spinner size="large" />}>
+      <Suspense maxDuration={1500} fallback={<Spinner size="large" />}>
         <ContributorListPage
           loadingId={loadingId}
           onUserClick={this.handleUserClick}
         />
-      </Placeholder>
+      </Suspense>
     );
   }
 }

@@ -387,7 +387,7 @@ describe('ReactDOM', () => {
     }
   });
 
-  it('should not crash calling findDOMNode inside a functional component', () => {
+  it('should not crash calling findDOMNode inside a function component', () => {
     const container = document.createElement('div');
 
     class Component extends React.Component {
@@ -455,9 +455,11 @@ describe('ReactDOM', () => {
     try {
       delete global.requestAnimationFrame;
       jest.resetModules();
-      expect(() => require('react-dom')).toWarnDev(
+      spyOnDevAndProd(console, 'error');
+      require('react-dom');
+      expect(console.error.calls.count()).toEqual(1);
+      expect(console.error.calls.argsFor(0)[0]).toMatch(
         "This browser doesn't support requestAnimationFrame.",
-        {withoutStack: true},
       );
     } finally {
       global.requestAnimationFrame = previousRAF;

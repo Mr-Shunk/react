@@ -1,6 +1,6 @@
 {
   "private": true,
-  "version": "16.5.0",
+  "version": "16.6.0",
   "workspaces": [
     "packages/*"
   ],
@@ -9,7 +9,7 @@
     "babel-cli": "^6.6.5",
     "babel-code-frame": "^6.26.0",
     "babel-core": "^6.0.0",
-    "babel-eslint": "^8.0.0",
+    "babel-eslint": "^10.0.0",
     "babel-jest": "^23.0.1",
     "babel-plugin-check-es2015-constants": "^6.5.0",
     "babel-plugin-external-helpers": "^6.22.0",
@@ -44,6 +44,7 @@
     "create-react-class": "^15.6.3",
     "cross-env": "^5.1.1",
     "danger": "^3.0.4",
+    "error-stack-parser": "^2.0.2",
     "eslint": "^4.1.0",
     "eslint-config-fbjs": "^1.1.1",
     "eslint-plugin-babel": "^3.3.0",
@@ -99,7 +100,9 @@
     "postinstall": "node node_modules/fbjs-scripts/node/check-dev-engines.js package.json && node ./scripts/flow/createFlowConfigs.js",
     "debug-test": "cross-env NODE_ENV=development node --inspect-brk node_modules/.bin/jest --config ./scripts/jest/config.source.js --runInBand",
     "test": "cross-env NODE_ENV=development jest --config ./scripts/jest/config.source.js",
+    "test-fire": "cross-env NODE_ENV=development jest --config ./scripts/jest/config.source-fire.js",
     "test-prod": "cross-env NODE_ENV=production jest --config ./scripts/jest/config.source.js",
+    "test-fire-prod": "cross-env NODE_ENV=production jest --config ./scripts/jest/config.source-fire.js",
     "test-prod-build": "yarn test-build-prod",
     "test-build": "cross-env NODE_ENV=development jest --config ./scripts/jest/config.build.js",
     "test-build-prod": "cross-env NODE_ENV=production jest --config ./scripts/jest/config.build.js",
