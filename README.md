@@ -1,77 +1,134 @@
-# [React](https://reactjs.org/) &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/facebook/react/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/react.svg?style=flat)](https://www.npmjs.com/package/react) [![Coverage Status](https://img.shields.io/coveralls/facebook/react/master.svg?style=flat)](https://coveralls.io/github/facebook/react?branch=master) [![CircleCI Status](https://circleci.com/gh/facebook/react.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/facebook/react) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://reactjs.org/docs/how-to-contribute.html#your-first-pull-request)
+# react-notes
 
-React is a JavaScript library for building user interfaces.
+## 相关文档
 
-* **Declarative:** React makes it painless to create interactive UIs. Design simple views for each state in your application, and React will efficiently update and render just the right components when your data changes. Declarative views make your code more predictable, simpler to understand, and easier to debug.
-* **Component-Based:** Build encapsulated components that manage their own state, then compose them to make complex UIs. Since component logic is written in JavaScript instead of templates, you can easily pass rich data through your app and keep state out of the DOM.
-* **Learn Once, Write Anywhere:** We don't make assumptions about the rest of your technology stack, so you can develop new features in React without rewriting existing code. React can also render on the server using Node and power mobile apps using [React Native](https://facebook.github.io/react-native/).
+** React
+- [React 官方文档](https://reactjs.org/)
+- [React 中文文档](https://react.docschina.org/)
 
-[Learn how to use React in your own project](https://reactjs.org/docs/getting-started.html).
+** react-router
+- [react-router 官方文档](https://reacttraining.com/react-router/)
+- [react-router 中文文档](https://react-router.docschina.org/)
 
-## Installation
+** Redux
+- [Redux 官方文档](https://redux.js.org/)
+- [Redux 中文文档](https://cn.redux.js.org/)
 
-React has been designed for gradual adoption from the start, and **you can use as little or as much React as you need**:
+** MobX
+- [MobX 官方文档](https://mobx.js.org/)
+- [MobX 中文文档](https://cn.mobx.js.org/)
+- [mobx-react](https://github.com/mobxjs/mobx-react)
+- [mobx-react-devtools](https://github.com/mobxjs/mobx-react-devtools)
 
-* Use [Online Playgrounds](https://reactjs.org/docs/getting-started.html#online-playgrounds) to get a taste of React.
-* [Add React to a Website](https://reactjs.org/docs/add-react-to-a-website.html) as a `<script>` tag in one minute.
-* [Create a New React App](https://reactjs.org/docs/create-a-new-react-app.html) if you're looking for a powerful JavaScript toolchain.
+** React Native
+- [React Native 官方文档](https://facebook.github.io/react-native/)
+- [React Native 中文网](https://reactnative.cn/)
 
-You can use React as a `<script>` tag from a [CDN](https://reactjs.org/docs/cdn-links.html), or as a `react` package on [npm](https://www.npmjs.com/).
+** React VR
+- [React VR 官方文档](https://facebook.github.io/react-360/)
+- [React VR 中文网](http://www.vr-react.com/)
 
-## Documentation
+** 工具
 
-You can find the React documentation [on the website](https://reactjs.org/docs).  
+- [create-react-app](https://facebook.github.io/create-react-app/)
+- [React developer tools](https://github.com/facebook/react-devtools)
+- [Redux DevTools](https://github.com/reduxjs/redux-devtools)
 
-Check out the [Getting Started](https://reactjs.org/docs/getting-started.html) page for a quick overview.
+- [react-starter-kit](https://github.com/bodyno/react-starter-kit)
 
-The documentation is divided into several sections:
 
-* [Tutorial](https://reactjs.org/tutorial/tutorial.html)
-* [Main Concepts](https://reactjs.org/docs/hello-world.html)
-* [Advanced Guides](https://reactjs.org/docs/jsx-in-depth.html)
-* [API Reference](https://reactjs.org/docs/react-api.html)
-* [Where to Get Support](https://reactjs.org/community/support.html)
-* [Contributing Guide](https://reactjs.org/docs/how-to-contribute.html)
+** Redux 中间件或工具
 
-You can improve it by sending pull requests to [this repository](https://github.com/reactjs/reactjs.org).
+- [react-redux](https://github.com/reduxjs/react-redux)
+- [Redux-thunk](https://github.com/reduxjs/redux-thunk): 指路先驱，Redux作者Dan写的中间件
+- [Redux-saga](https://github.com/reduxjs/redux-thunk)：难、而美
+- [redux-immutable](https://github.com/redux-saga/redux-saga)
+- [redux-promise](https://github.com/acdlite/redux-promise): 瘦身过头, 社区出现的方案
+- [redux-promise-middleware](https://github.com/pburtchaell/redux-promise-middleware): 相比redux-promise，采取了更为温和和渐进式的思路
 
-## Examples
+- [redux-undo](https://github.com/omnidan/redux-undo)
+- [react-redux-form](https://github.com/davidkpiano/react-redux-form)
 
-We have several examples [on the website](https://reactjs.org/). Here is the first one to get you started:
+- [redux-actions](https://github.com/redux-utilities/redux-actions)
+- [redux-observable](https://github.com/redux-observable/redux-observable):Redux-Observable是配合RxJS使用的一个框架
+- [redux-loop](https://github.com/redux-loop/redux-loop)
 
-```jsx
-class HelloMessage extends React.Component {
-  render() {
-    return <div>Hello {this.props.name}</div>;
-  }
-}
 
-ReactDOM.render(
-  <HelloMessage name="Taylor" />,
-  document.getElementById('container')
-);
-```
+** 
+- [react-transition-group](https://reactcommunity.org/react-transition-group/)
+- [styled-components](https://www.styled-components.com/)
+- [immutable-js](https://facebook.github.io/immutable-js/)
 
-This example will render "Hello Taylor" into a container on the page.
+** 
+- [awesome-react](https://github.com/enaqx/awesome-react)
+- [awesome-react-components](https://github.com/brillout/awesome-react-components)
+- [awesome-redux](https://github.com/xgrommx/awesome-redux)
+- [React 中文](http://react-china.org/)
+- [React 中文索引](http://nav.react-china.org/)
 
-You'll notice that we used an HTML-like syntax; [we call it JSX](https://reactjs.org/docs/introducing-jsx.html). JSX is not required to use React, but it makes code more readable, and writing it feels like writing HTML. If you're using React as a `<script>` tag, read [this section](https://reactjs.org/docs/add-react-to-a-website.html#optional-try-react-with-jsx) on integrating JSX; otherwise, the [recommended JavaScript toolchains](https://reactjs.org/docs/create-a-new-react-app.html) handle it automatically.
+**
+- [react-keeper](https://github.com/vifird/react-keeper)
 
-## Contributing
 
-The main purpose of this repository is to continue to evolve React core, making it faster and easier to use. Development of React happens in the open on GitHub, and we are grateful to the community for contributing bugfixes and improvements. Read below to learn how you can take part in improving React.
+** 相关
+- [React.js 小书](http://huziketang.mangojuice.top/books/react/)
+- [React 模式](http://sangka-z.com/react-in-patterns-cn/)
+- [React 模式 (极客教程)](https://www.geekjc.com/ebook/detail/5bae0c10ddb4f437ecfdc708/1538132695121)
 
-### [Code of Conduct](https://code.facebook.com/codeofconduct)
+## 生态
 
-Facebook has adopted a Code of Conduct that we expect project participants to adhere to. Please read [the full text](https://code.facebook.com/codeofconduct) so that you can understand what actions will and will not be tolerated.
+- [preact](https://preactjs.com/)：React 的 3kb 轻量化方案，拥有同样的 ES6 API
 
-### [Contributing Guide](https://reactjs.org/contributing/how-to-contribute.html)
+- [dvajs](https://dvajs.com/)：基于 React 和 redux，具有 elm 风格的轻量级框架
 
-Read our [contributing guide](https://reactjs.org/contributing/how-to-contribute.html) to learn about our development process, how to propose bugfixes and improvements, and how to build and test your changes to React.
+** UI
 
-### Good First Issues
+- [material-ui](https://material-ui.com/)
+- [ant.design](https://ant.design/index-cn)：阿里巴巴 - 企业级的 UI 设计语言和 React 实现
+- [Ant Design Mobile](https://mobile.ant.design/index-cn)：一个基于 Preact / React / React Native 的 UI 组件库
+- [element-react](https://elemefe.github.io/element-react/#/zh-CN/quick-start)：饿了么 - Element UI 的 React 实现
+- [Zent](https://youzan.github.io/zent/zh/guides/install)：有赞 PC 端 WebUI 规范的 React 实现
+- [pile Mobile](https://didi.github.io/pile.js/#/?_k=iycbqk)：滴滴 - 移动端 React 组件库
+- [react-weui](https://github.com/weui/react-weui)
+- [react-bootstrap](https://github.com/react-bootstrap/react-bootstrap)
+- [reactstrap](https://github.com/reactstrap/reactstrap)
+- [Semantic-UI](https://github.com/Semantic-Org/Semantic-UI)
+- [OnsenUI](https://github.com/OnsenUI/OnsenUI)
 
-To help you get your feet wet and get you familiar with our contribution process, we have a list of [good first issues](https://github.com/facebook/react/labels/good%20first%20issue) that contain bugs which have a relatively limited scope. This is a great place to get started.
+- [bee-mobiles](https://bee-mobiles.github.io/)
+- [react-toolbox](https://github.com/react-toolbox/react-toolbox/)
+- [office-ui-fabric-react](https://github.com/OfficeDev/office-ui-fabric-react)
+- [react-uwp](https://www.react-uwp.com/)
+- [motion.ant.design](https://motion.ant.design/)
 
-### License
 
-React is [MIT licensed](./LICENSE).
+** 
+- [ant design pro](https://pro.ant.design/index-cn): 开箱即用的中台前端/设计解决方案
+
+- [react-redux-starter-kit](https://github.com/davezuko/react-redux-starter-kit)
+- [react-boilerplate](https://github.com/react-boilerplate/react-boilerplate)
+- [react-admin](https://github.com/marmelab/react-admin)
+
+
+** 数据可视化
+- [antv](https://antv.alipay.com/zh-cn/g2/3.x/tutorial)
+- [bizcharts](http://bizcharts.net/index): 数据可视化解决方案
+- [viserjs](https://viserjs.github.io/docs.html#/viser/guide/installation)
+- [d3](https://github.com/d3/d3)
+- [react-d3-website](https://reactiva.github.io/react-d3-website/)
+- [react-d3-components](https://github.com/codesuki/react-d3-components)
+- [echarts](https://github.com/apache/incubator-echarts)
+- [echarts-for-react](https://github.com/hustcc/echarts-for-react)
+- [incubator-echarts](https://github.com/apache/incubator-echarts)
+- [react-highcharts](https://github.com/kirjs/react-highcharts)
+
+
+## 
+
+- [react-developer-roadmap](https://github.com/adam-golab/react-developer-roadmap)
+
+## book
+
+- 《深入React技术栈》
+- 《React前端技术与工程实践》
+- 《React设计模式与最佳实践》
